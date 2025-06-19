@@ -1,16 +1,103 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-	<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>Soundbar with Cloud Audio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 50px;
+    }
+
+    #buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .btn, .stop {
+      padding: 15px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    .stop {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .stop:hover {
+      background-color: #e53935;
+    }
+  </style>
 </head>
-
 <body>
-	<!-- the entire body must be written by student -->
-    <script type="text/javascript" src="./script.js">
-</script>
+  <div id="buttons"></div>
 
+  <script>
+    const sounds = [
+      {
+        name: "Clap",
+        url: "https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
+      },
+      {
+        name: "Bell",
+        url: "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
+      },
+      {
+        name: "HiHat",
+        url: "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
+      }
+    ];
+
+    const buttonsContainer = document.getElementById("buttons");
+    let currentAudio = null;
+
+    sounds.forEach(sound => {
+      const btn = document.createElement("button");
+      btn.classList.add("btn");
+      btn.innerText = sound.name;
+
+      btn.addEventListener("click", () => {
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+        }
+        currentAudio = new Audio(sound.url);
+        currentAudio.play();
+      });
+
+      buttonsContainer.appendChild(btn);
+    });
+
+    const stopBtn = document.createElement("button");
+    stopBtn.classList.add("stop");
+    stopBtn.innerText = "Stop";
+
+    stopBtn.addEventListener("click", () => {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        currentAudio = null;
+      }
+    });
+
+    buttonsContainer.appendChild(stopBtn);
+  </script>
 </body>
-
 </html>
