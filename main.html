@@ -1,103 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Soundbar with Cloud Audio</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      text-align: center;
-      padding: 50px;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Soundbar</title>
+<style>
+  body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f5f5f5;
+    padding:50px;
+    text-align:center;
+  }
 
-    #buttons {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
+  #buttons{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:20px;
+  }
 
-    .btn, .stop {
-      padding: 15px 30px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
+  .btn,
+  .stop{
+    padding:15px 30px;
+    font-size:16px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    transition:.2s;
+  }
+  .btn{
+    background:#4caf50;
+    color:#fff;
+  }
+  .btn:hover{background:#45a049;}
 
-    .btn {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    .btn:hover {
-      background-color: #45a049;
-    }
-
-    .stop {
-      background-color: #f44336;
-      color: white;
-    }
-
-    .stop:hover {
-      background-color: #e53935;
-    }
-  </style>
+  .stop{
+    background:#f44336;
+    color:#fff;
+  }
+  .stop:hover{background:#e53935;}
+</style>
 </head>
 <body>
-  <div id="buttons"></div>
 
-  <script>
-    const sounds = [
-      {
-        name: "Clap",
-        url: "https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
-      },
-      {
-        name: "Bell",
-        url: "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
-      },
-      {
-        name: "HiHat",
-        url: "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
-      }
-    ];
+<h1>Soundbar</h1>
+<p>Click a button to play a sound — press <strong>Stop</strong> to halt.</p>
 
-    const buttonsContainer = document.getElementById("buttons");
-    let currentAudio = null;
+<div id="buttons"></div>
 
-    sounds.forEach(sound => {
-      const btn = document.createElement("button");
-      btn.classList.add("btn");
-      btn.innerText = sound.name;
+<script>
+/* ─── 1.  List your audio files here (no extension required) ─── */
+const soundNames = ["clap", "bell", "hihat"];   // sounds/clap.mp3, …
 
-      btn.addEventListener("click", () => {
-        if (currentAudio) {
-          currentAudio.pause();
-          currentAudio.currentTime = 0;
-        }
-        currentAudio = new Audio(sound.url);
-        currentAudio.play();
-      });
+const buttonsBox  = document.getElementById("buttons");
+let currentAudio  = null;
 
-      buttonsContainer.appendChild(btn);
-    });
+/* ─── 2.  Create one button per sound ─── */
+soundNames.forEach(name => {
+  const btn = document.createElement("button");
+  btn.className = "btn";
+  btn.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  btn.addEventListener("click", () => playSound(name));
+  buttonsBox.appendChild(btn);
+});
 
-    const stopBtn = document.createElement("button");
-    stopBtn.classList.add("stop");
-    stopBtn.innerText = "Stop";
+/* ─── 3.  The universal Stop button ─── */
+const stopBtn = document.createElement("button");
+stopBtn.className = "stop";
+stopBtn.textContent = "Stop";
+stopBtn.addEventListener("click", stopSound);
+buttonsBox.appendChild(stopBtn);
 
-    stopBtn.addEventListener("click", () => {
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-        currentAudio = null;
-      }
-    });
+/* ─── 4.  Helpers ─── */
+function playSound(name){
+  stopSound();  // ensure only one plays
+  currentAudio = new Audio(`sounds/${name}.mp3`);
+  currentAudio.play();
+}
 
-    buttonsContainer.appendChild(stopBtn);
-  </script>
+function stopSound(){
+  if(currentAudio){
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+}
+</script>
 </body>
 </html>
