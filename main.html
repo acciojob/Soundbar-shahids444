@@ -1,57 +1,87 @@
-<!-- keep the same <head> and <style> … -->
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Soundbar</title>
+<style>
+  body{
+    margin:0;padding:50px;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f5f5f5;
+    text-align:center;
+  }
+  #buttons{
+    display:flex;justify-content:center;flex-wrap:wrap;gap:20px;
+  }
+  .btn,.stop{
+    padding:15px 30px;font-size:16px;border:none;border-radius:6px;
+    cursor:pointer;transition:.2s;
+  }
+  .btn{background:#4caf50;color:#fff;}
+  .btn:hover{background:#45a049;}
+  .stop{background:#f44336;color:#fff;}
+  .stop:hover{background:#e53935;}
+</style>
+</head>
 <body>
+
 <h1>Soundbar</h1>
-<p>Click a button to play a sound, or <strong>Stop</strong> to halt.</p>
+<p>Click a sound to play it — press <strong>Stop</strong> to silence everything.</p>
 
 <div id="buttons"></div>
 
 <script>
-/* ─── names MUST match files inside ./sounds/ and test indices 0‑5 ─── */
+/* File names that must exist in ./sounds/  */
 const soundNames = ["applause","boo","gasp","tada","victory","wrong"];
 
-const btnBox = document.getElementById("buttons");
-const audios = {};               // <audio> elements keyed by name
-let current = null;              // currently playing <audio>
+const buttonsBox = document.getElementById("buttons");
+let currentAudio = null;   // the <audio> element currently playing
 
-/* build <audio> tags + buttons */
+/* ------------------------------------------------------------- */
+/* Build six sound buttons dynamically                           */
+/* ------------------------------------------------------------- */
 soundNames.forEach(name => {
-  /* audio element (hidden but in DOM!) */
-  const audio = document.createElement("audio");
-  audio.src   = `sounds/${name}.mp3`;
-  audio.preload = "auto";
-  audio.style.display = "none";   // keep it invisible
-  document.body.appendChild(audio);
-  audios[name] = audio;
-
-  /* corresponding button */
   const btn = document.createElement("button");
   btn.className  = "btn";
   btn.textContent= name.charAt(0).toUpperCase() + name.slice(1);
-  btn.addEventListener("click", () => play(name));
-  btnBox.appendChild(btn);
+  btn.addEventListener("click", () => playSound(name));
+  buttonsBox.appendChild(btn);
 });
 
-/* stop button */
+/* ------------------------------------------------------------- */
+/* Stop button                                                   */
+/* ------------------------------------------------------------- */
 const stopBtn = document.createElement("button");
 stopBtn.className  = "stop";
 stopBtn.textContent= "Stop";
-stopBtn.addEventListener("click", stop);
-btnBox.appendChild(stopBtn);
+stopBtn.addEventListener("click", stopSound);
+buttonsBox.appendChild(stopBtn);
 
-/* helpers */
-function play(name){
-  stop();                        // halt any previous clip
-  current = audios[name];
-  current.currentTime = 0;
-  /* swallow unsupported/missing errors so Cypress doesn’t fail */
-  current.play().catch(() => {});
+/* ------------------------------------------------------------- */
+/* Helpers                                                       */
+/* ------------------------------------------------------------- */
+function playSound(name){
+  stopSound();                               // ensure only one at a time
+
+  const audio = document.createElement("audio");
+  audio.src   = `sounds/${name}.mp3`;
+  audio.autoplay = true;
+  audio.style.display = "none";              // invisible but in DOM
+  document.body.appendChild(audio);
+  currentAudio = audio;
+
+  /* If browser can’t play, swallow the promise rejection so Cypress
+     doesn’t treat it as an uncaught error.                        */
+  audio.play().catch(() => {});
 }
-function stop(){
-  if(current){
-    current.pause();
-    current.currentTime = 0;
-    current = null;
+
+function stopSound(){
+  if(currentAudio){
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio.remove();    // detach from DOM so expectPlayingAudio sees none
+    currentAudio = null;
   }
 }
 </script>
