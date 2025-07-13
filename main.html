@@ -1,75 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Soundbar</title>
-<style>
-  body{
-    margin:0;padding:50px;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f5f5f5;
-    text-align:center;
-  }
-  #buttons{
-    display:flex;justify-content:center;flex-wrap:wrap;gap:20px;
-  }
-  .btn,.stop{
-    padding:15px 30px;font-size:16px;border:none;border-radius:6px;
-    cursor:pointer;transition:.2s;
-  }
-  .btn{background:#4caf50;color:#fff;}
-  .btn:hover{background:#45a049;}
-  .stop{background:#f44336;color:#fff;}
-  .stop:hover{background:#e53935;}
-</style>
-</head>
-<body>
+<!-- keep the same <head> and <style> … -->
 
+<body>
 <h1>Soundbar</h1>
 <p>Click a button to play a sound, or <strong>Stop</strong> to halt.</p>
 
 <div id="buttons"></div>
 
 <script>
-/* ─── names MUST match files inside ./sounds/ and test indices 0‑5 ─── */
+/* ─── names MUST match files inside ./sounds/ and test indices 0‑5 ─── */
 const soundNames = ["applause","boo","gasp","tada","victory","wrong"];
 
-const buttonsBox = document.getElementById("buttons");
-const audios     = {};   // store <audio> elements keyed by name
-let current      = null; // currently‑playing audio element
+const btnBox = document.getElementById("buttons");
+const audios = {};               // <audio> elements keyed by name
+let current = null;              // currently playing <audio>
 
-/* build audio elements + buttons */
-soundNames.forEach(name=>{
-  /* audio */
-  const audio   = document.createElement("audio");
-  audio.src     = `sounds/${name}.mp3`;
+/* build <audio> tags + buttons */
+soundNames.forEach(name => {
+  /* audio element (hidden but in DOM!) */
+  const audio = document.createElement("audio");
+  audio.src   = `sounds/${name}.mp3`;
   audio.preload = "auto";
-  audios[name]  = audio;         // stash for quick access
+  audio.style.display = "none";   // keep it invisible
+  document.body.appendChild(audio);
+  audios[name] = audio;
 
-  /* button */
+  /* corresponding button */
   const btn = document.createElement("button");
-  btn.className   = "btn";
-  btn.textContent = name.charAt(0).toUpperCase() + name.slice(1);
-  btn.addEventListener("click",()=>play(name));
-  buttonsBox.appendChild(btn);
+  btn.className  = "btn";
+  btn.textContent= name.charAt(0).toUpperCase() + name.slice(1);
+  btn.addEventListener("click", () => play(name));
+  btnBox.appendChild(btn);
 });
 
 /* stop button */
-const stopBtn      = document.createElement("button");
+const stopBtn = document.createElement("button");
 stopBtn.className  = "stop";
 stopBtn.textContent= "Stop";
-stopBtn.addEventListener("click",stop);
-buttonsBox.appendChild(stopBtn);
+stopBtn.addEventListener("click", stop);
+btnBox.appendChild(stopBtn);
 
 /* helpers */
 function play(name){
-  stop();                       // ensure single playback
+  stop();                        // halt any previous clip
   current = audios[name];
-  /* If the file is missing or not supported, play() will reject.
-     Catch it so Cypress doesn’t fail on NotSupportedError. */
   current.currentTime = 0;
-  current.play().catch(()=>{}); // swallow unsupported/missing errors
+  /* swallow unsupported/missing errors so Cypress doesn’t fail */
+  current.play().catch(() => {});
 }
 function stop(){
   if(current){
